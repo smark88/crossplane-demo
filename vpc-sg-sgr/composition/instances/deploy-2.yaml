@@ -1,0 +1,8 @@
+apiVersion: smark.com/v1alpha1
+kind: vpcExample
+metadata:
+  name: smark-test-vpc-2
+spec:
+  parameters:
+    region: us-west-1
+    cidrBlock: 10.9.0.0/16 
