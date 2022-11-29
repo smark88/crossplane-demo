@@ -1,0 +1,18 @@
+# ❯ watch "kubectl get clusters,nodegroup,vpcs,securitygroups,subnets,internetgateways,routetables,RolePolicyAttachment"
+apiVersion: smark.com/v1alpha1
+kind: CompositeKubernetesCluster
+metadata:
+  name: smark-test-eks
+  labels:
+    cluster-owner: smark
+spec:
+  compositionRef:
+    name: cluster-aws
+  parameters:
+    # Possible values small, medium, large
+    nodeSize: small
+    # version: "1.23"
+    # minNodeCount: 2
+  writeConnectionSecretToRef:
+    namespace: crossplane-system
+    name: cluster
