@@ -4,6 +4,10 @@ Create resources using crosplane
 ## Overview 
 create indivdual resources and recreate the same resources using Composition (XR) and CompositeResourceDefinition(XRD)
 
+## Versions
+Crossplane: 1.10
+aws-provider: 0.33
+
 ## Example 
 Create vpc sg and sgr
 ```
