@@ -1,0 +1,7 @@
+apiVersion: smark.com/v1alpha1
+kind: vpcExample
+metadata:
+  name: smark-test-vpc
+spec:
+  parameters:
+    region: us-west-1

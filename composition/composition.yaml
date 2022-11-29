@@ -1,0 +1,97 @@
+# XR
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: vpcexample
+  labels:
+    crossplane.io/xrd: vpcexample.smark.com
+spec:
+  writeConnectionSecretsToNamespace: crossplane-system
+  compositeTypeRef:
+    apiVersion: smark.com/v1alpha1
+    kind: vpcExample
+  resources:
+  - name: vpc
+    base:
+      apiVersion: ec2.aws.crossplane.io/v1beta1
+      kind: VPC
+      spec:
+        forProvider:
+          # region: us-west-1 pathced from patches below
+          # cidrBlock: 10.8.0.0/16
+          enableDnsSupport: true
+          enableDnsHostNames: true
+          instanceTenancy: default
+        providerConfigRef:
+          name: crossplane-provider-config
+    patches:
+      - type: FromCompositeFieldPath
+        fromFieldPath: spec.parameters.region
+        toFieldPath: spec.forProvider.region
+      - type: FromCompositeFieldPath
+        fromFieldPath: spec.parameters.cidrBlock
+        toFieldPath: spec.forProvider.cidrBlock
+      - type: FromCompositeFieldPath
+        fromFieldPath: metadata.name
+        toFieldPath: metadata.annotations.crossplane.io/external-name
+      - type: FromCompositeFieldPath
+        fromFieldPath: metadata.name
+        toFieldPath: metadata.labels.vpcname
+  - name: sg
+    base:
+      apiVersion: ec2.aws.crossplane.io/v1beta1
+      kind: SecurityGroup
+      spec:
+        forProvider:
+          groupName: my-cool-ekscluster-sg
+          description: Cluster communication with worker nodes
+          # ignoreIngress: true
+          # ignoreEgress: true
+          ingress:
+            - fromPort: 80
+              toPort: 80
+              ipProtocol: tcp
+              ipRanges:
+                - cidrIp: 10.0.0.0/8
+        providerConfigRef:
+          name: crossplane-provider-config
+    patches:
+      - type: FromCompositeFieldPath
+        fromFieldPath: metadata.name
+        toFieldPath: spec.forProvider.name
+      - type: FromCompositeFieldPath
+        fromFieldPath: metadata.name
+        toFieldPath: metadata.annotations.crossplane.io/external-name
+      - type: FromCompositeFieldPath
+        fromFieldPath: metadata.name
+        toFieldPath: metadata.labels.sgname
+      - type: FromCompositeFieldPath
+        fromFieldPath: spec.parameters.region
+        toFieldPath: spec.forProvider.region
+      - type: FromCompositeFieldPath
+        fromFieldPath: metadata.name
+        toFieldPath: spec.forProvider.vpcIdSelector.matchLabels.vpcname
+#  - name: sgr
+#    base:
+#      apiVersion: ec2.aws.crossplane.io/v1alpha1
+#      kind: SecurityGroupRule
+#      spec:
+#        forProvider:
+#          # region: us-west-1 pathced from patches below
+#          protocol: "tcp"
+#          fromPort: 443
+#          toPort: 443
+#          type: "ingress"
+#          # securityGroupIdRef: name override from instance.yaml "sgone"
+#          #   name: sample-cluster-sg
+#          cidrBlock: "123.12.0.0/16" 
+#          description: "sample-sgr description"
+#        providerConfigRef:
+#          name: crossplane-provider-config
+#    patches:
+#    - type: FromCompositeFieldPath
+#      fromFieldPath: spec.parameters.region
+#      toFieldPath: spec.forProvider.region
+#    - type: FromCompositeFieldPath
+#      fromFieldPath: metadata.name
+#      toFieldPath: spec.forProvider.securityGroupIdSelector.matchLabels.sgname

@@ -1,0 +1,35 @@
+# input vars requires a region
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: vpcexample.smark.com
+spec:
+  group: smark.com
+  names:
+    kind: vpcExample
+    plural: vpcexample
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              parameters:
+                type: object
+                properties:
+                  region:
+                    description: The region to deploy.
+                    type: string
+                  cidrBlock:
+                    description: The size cidrBlock for the vpc.
+                    default: 10.8.0.0/16 
+                    type: string
+                required:
+                - region
+            required:
+            - parameters
